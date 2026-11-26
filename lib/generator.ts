@@ -65,7 +65,7 @@ export function generateTrips(o: GenOptions): GenResult {
       const km = round1(s.km);
       trips.push({
         vehicle_id: o.vehicleId, driver_id: o.driverId, trip_date: d, time_start: hm(t), time_end: hm(t + dur),
-        from_loc: o.baseId, to_loc: s.to, round_trip: !s.local, route_text: s.local ? localName : null,
+        from_loc: o.baseId || null, to_loc: s.to || null, round_trip: !s.local, route_text: s.local ? localName : null,
         purpose: s.local ? "deplasări locale în interes de serviciu" : loc?.default_purpose || "deplasare în interes de serviciu",
         km_start: round1(odo), km_end: round1(odo + km), generated: true,
       });

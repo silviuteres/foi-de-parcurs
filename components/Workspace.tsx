@@ -314,7 +314,7 @@ function Generator({ sb, vehicle, month, sum, sheet, drivers, locations, distanc
   }
   async function save() {
     if (!res) return; setBusy(true);
-    const ok = await run(sb.from("trips").insert(res.trips.map((t) => ({ ...t, company_id: companyId }))), `Am adăugat ${res.trips.length} curse în foaia lunii.`);
+    const ok = await run(sb.from("trips").insert(res.trips.map((t) => ({ ...t, company_id: companyId, driver_id: t.driver_id || null, from_loc: t.from_loc || null, to_loc: t.to_loc || null }))), `Am adăugat ${res.trips.length} curse în foaia lunii.`);
     setBusy(false); if (ok) { setRes(null); onSaved(); }
   }
   const all = monthDays(month), off = weekday(all[0]);
