@@ -1,0 +1,523 @@
+<title>Foi de parcurs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: o bandă de context (mașină + lună) deasupra unor file de lucru; tabele dense, cifre monospațiate ca pe un kilometraj. */
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --sunk:#eaefed; --line:#d3dbd8; --fg:#17201d; --muted:#5b6964;
+  --accent:#0f6b5a; --accent-fg:#ffffff; --accent-soft:#dcefe9;
+  --warn:#9a5b00; --warn-soft:#fbefd9; --bad:#a3261c; --bad-soft:#f8e1de;
+  --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101614; --surface:#18201d; --sunk:#131a18; --line:#2c3834; --fg:#e4ebe8; --muted:#94a39e;
+  --accent:#4cc3a6; --accent-fg:#06231c; --accent-soft:#183a32;
+  --warn:#f0b45a; --warn-soft:#3a2c14; --bad:#f08a80; --bad-soft:#3d1c19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101614; --surface:#18201d; --sunk:#131a18; --line:#2c3834; --fg:#e4ebe8; --muted:#94a39e;
+  --accent:#4cc3a6; --accent-fg:#06231c; --accent-soft:#183a32;
+  --warn:#f0b45a; --warn-soft:#3a2c14; --bad:#f08a80; --bad-soft:#3d1c19; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 48px;display:flex;flex-direction:column;gap:16px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:16px;margin:0;text-wrap:balance}
+h3{font-size:12px;margin:0;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.sub{color:var(--muted);margin:2px 0 0}
+.ctx{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.ctx .plate{font-family:var(--f-num);font-weight:500;font-size:15px;border:2px solid var(--fg);border-radius:4px;padding:2px 8px;background:var(--surface)}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0;width:100%}
+input[type=checkbox]{width:auto}
+input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px;padding:6px 12px;white-space:nowrap}
+button.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:4px 6px}
+button.ghost:hover{color:var(--bad)}
+button:disabled{opacity:.5;cursor:not-allowed}
+nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs button{border:none;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--muted);padding:8px 12px;font-weight:500}
+nav.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+section.panel{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.tile .v{font-family:var(--f-num);font-size:20px;font-weight:500}
+.tile .l{font-size:12px;color:var(--muted)}
+.tile.ok{border-color:var(--accent)} .tile.bad{border-color:var(--bad)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;background:var(--sunk);white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.warn td{background:var(--warn-soft)}
+tfoot td{font-weight:600;background:var(--sunk)}
+.pill{display:inline-block;font-size:11px;border-radius:999px;padding:1px 8px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.pill.w{background:var(--warn-soft);color:var(--warn)}
+.note{border-radius:var(--r);padding:10px 12px;background:var(--warn-soft);color:var(--fg);font-size:13px;border:1px solid var(--line)}
+.note b{color:var(--warn)}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-num)}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:420px}
+.days .dh{font-size:11px;color:var(--muted);text-align:center}
+.days label{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px;padding:4px 0;font-family:var(--f-num);font-size:12px;cursor:pointer;user-select:none}
+.days label.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.days input{position:absolute;opacity:0;pointer-events:none}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:var(--r);font-size:13px;z-index:20;max-width:calc(100% - 32px)}
+.status{font-size:12px;color:var(--muted)}
+.two{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.two>*{min-width:0}
+@media (max-width:520px){h1{font-size:19px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 id="firmaTitlu">Foi de parcurs</h1>
+      <p class="sub">Evidență separată pe fiecare mașină: curse, kilometraj, alimentări și foaia lunară.</p>
+    </div>
+    <span class="status" id="status">Se încarcă datele…</span>
+  </header>
+
+  <div class="ctx">
+    <label class="f" style="min-width:200px">Mașina
+      <select id="selVeh"></select>
+    </label>
+    <label class="f">Luna
+      <input type="month" id="selLuna">
+    </label>
+    <span class="plate" id="plate" hidden></span>
+    <span class="muted" id="vehInfo"></span>
+  </div>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="foaie" aria-selected="true">Foaia lunară</button>
+    <button role="tab" data-tab="gen" aria-selected="false">Generator curse</button>
+    <button role="tab" data-tab="masini" aria-selected="false">Mașini</button>
+    <button role="tab" data-tab="soferi" aria-selected="false">Șoferi</button>
+    <button role="tab" data-tab="locatii" aria-selected="false">Locații și distanțe</button>
+    <button role="tab" data-tab="firma" aria-selected="false">Firmă</button>
+  </nav>
+
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+const S={vehicule:[],soferi:[],locatii:[],distante:[],curse:[],alimentari:[],foi:[],setari:[]};
+const COLS=Object.keys(S);
+let db=null, dl=null, readOnly=false, loaded=new Set();
+const today=new Date();
+const ui={tab:"foaie", veh:null, luna:today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0"), editCursa:null, gen:null, genDays:null, genKey:""};
+try{const t=localStorage.getItem("fp_tab"); if(t) ui.tab=t; const v=localStorage.getItem("fp_veh"); if(v) ui.veh=v;}catch(e){}
+
+/* ---------- utilitare ---------- */
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:0};
+const fmt=(n,d=0)=>Number(n||0).toLocaleString("ro-RO",{minimumFractionDigits:d,maximumFractionDigits:d});
+const byId=(col,id)=>S[col].find(x=>x.id===id);
+const nume=(col,id)=>{const x=byId(col,id);return x?(x.nume||x.nr||""):""};
+const zileSapt=["Lu","Ma","Mi","Jo","Vi","Sâ","Du"];
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2600)}
+function lunaZile(luna){const[y,m]=luna.split("-").map(Number);const n=new Date(y,m,0).getDate();return Array.from({length:n},(_,i)=>`${luna}-${String(i+1).padStart(2,"0")}`)}
+function dow(d){const x=new Date(d+"T12:00:00");return (x.getDay()+6)%7}
+function dataRo(d){if(!d)return"";const[y,m,z]=d.split("-");return `${z}.${m}.${y}`}
+const lunaNume=l=>{const[y,m]=l.split("-");return ["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"][+m-1]+" "+y};
+// Sărbători legale cu dată fixă (cele mobile — Paște, Rusalii, Vinerea Mare — se debifează manual)
+const SARB_FIXE=["01-01","01-02","01-06","01-07","01-24","05-01","06-01","08-15","11-30","12-01","12-25","12-26"];
+const firma=()=>(S.setari.find(x=>x.id==="firma")||{});
+function distKm(a,b){if(!a||!b||a===b)return 0;const d=S.distante.find(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));return d?num(d.km):null}
+function traseu(c){const a=nume("locatii",c.deLa)||c.deLaText||"",b=nume("locatii",c.la)||c.laText||"";if(c.traseuText)return c.traseuText;return c.dusIntors?`${a} – ${b} – ${a}`:`${a} – ${b}`}
+const kmP=c=>num(c.kmS)-num(c.kmP);
+
+/* ---------- date ---------- */
+async function boot(){
+  if(!window.claude||!claude.use){setStatus("Aplicația funcționează doar deschisă în Claude.");render();return}
+  [db,dl]=await Promise.all([claude.use("db"),claude.use("downloads")]);
+  if(!db){setStatus("Datele nu pot fi încărcate în această vizualizare. Deschideți pagina conectat la contul Claude.");render();return}
+  try{const u=await claude.use("user"); if(u){const w=await u.can("data.write"); if(w===false) readOnly=true;}}catch(e){}
+  const timer=setTimeout(()=>{if(loaded.size<COLS.length)setStatus("Datele nu au putut fi încărcate încă. Verificați conexiunea.")},10000);
+  for(const c of COLS){
+    db.collection(c).onSnapshot(snap=>{
+      S[c]=snap.docs.map(d=>({id:d.id,...d.data()}));
+      if(!snap.metadata.fromCache) loaded.add(c);
+      if(loaded.size===COLS.length){clearTimeout(timer);setStatus(readOnly?"Doar citire":"Salvat automat")}
+      render();
+    },err=>{setStatus("Eroare la încărcare: "+err.code)});
+  }
+}
+function setStatus(t){$("#status").textContent=t}
+async function save(col,id,data){
+  if(!db||readOnly){toast("Nu aveți drept de scriere.");return false}
+  try{ if(id) await db.collection(col).doc(id).set(data); else await db.collection(col).add(data); return true}
+  catch(e){toast(e.code==="quota_exceeded"?"Spațiul de date este plin. Ștergeți curse vechi.":"Nu s-a putut salva ("+e.code+").");return false}
+}
+async function del(col,id){if(!db||readOnly)return;try{await db.collection(col).doc(id).delete()}catch(e){toast("Nu s-a putut șterge.")}}
+function form(el){const o={};el.querySelectorAll("[name]").forEach(i=>{o[i.name]=i.type==="checkbox"?i.checked:i.value.trim()});return o}
+
+/* ---------- calcule pe mașină/lună ---------- */
+function curseLuna(veh,luna){return S.curse.filter(c=>c.veh===veh&&(c.data||"").startsWith(luna)).sort((a,b)=>(a.data+(a.oraP||"")).localeCompare(b.data+(b.oraP||""))||num(a.kmP)-num(b.kmP))}
+function alimLuna(veh,luna){return S.alimentari.filter(a=>a.veh===veh&&(a.data||"").startsWith(luna)).sort((a,b)=>a.data.localeCompare(b.data))}
+function foaie(veh,luna){return S.foi.find(f=>f.id===`${veh}_${luna}`)||{}}
+function ultimKm(veh,inainte){ // km la sosire al ultimei curse înainte de data dată
+  const v=byId("vehicule",veh);let best=null;
+  for(const c of S.curse) if(c.veh===veh&&(!inainte||c.data<inainte)){if(!best||num(c.kmS)>num(best.kmS))best=c}
+  return best?num(best.kmS):num(v&&v.kmInitial)}
+function calc(veh,luna){
+  const v=byId("vehicule",veh)||{}; const cs=curseLuna(veh,luna), al=alimLuna(veh,luna), f=foaie(veh,luna);
+  const km=cs.reduce((s,c)=>s+kmP(c),0);
+  const consum=km*num(v.consum)/100;
+  const alim=al.reduce((s,a)=>s+num(a.litri),0), val=al.reduce((s,a)=>s+num(a.valoare),0);
+  const stocI=f.stocInitial!==undefined&&f.stocInitial!==""?num(f.stocInitial):stocPrecedent(veh,luna);
+  return {v,cs,al,f,km,consum,alim,val,stocI,stocF:stocI+alim-consum,kmStart:cs.length?num(cs[0].kmP):ultimKm(veh,luna+"-01"),kmEnd:cs.length?num(cs[cs.length-1].kmS):ultimKm(veh,luna+"-01")}
+}
+function lunaPrec(l){let[y,m]=l.split("-").map(Number);m--;if(!m){m=12;y--}return `${y}-${String(m).padStart(2,"0")}`}
+function stocPrecedent(veh,luna,depth=0){ // stocul final al lunii anterioare, dacă există date
+  if(depth>24)return 0; const p=lunaPrec(luna);
+  const has=S.curse.some(c=>c.veh===veh&&c.data.startsWith(p))||S.alimentari.some(a=>a.veh===veh&&a.data.startsWith(p))||S.foi.some(f=>f.id===`${veh}_${p}`);
+  if(!has)return 0;
+  const v=byId("vehicule",veh)||{}, f=foaie(veh,p);
+  const km=curseLuna(veh,p).reduce((s,c)=>s+kmP(c),0), alim=alimLuna(veh,p).reduce((s,a)=>s+num(a.litri),0);
+  const si=f.stocInitial!==undefined&&f.stocInitial!==""?num(f.stocInitial):stocPrecedent(veh,p,depth+1);
+  return si+alim-km*num(v.consum)/100}
+
+/* ---------- randare ---------- */
+function render(){
+  const f=firma(); $("#firmaTitlu").textContent=f.nume?`Foi de parcurs · ${f.nume}`:"Foi de parcurs";
+  const sv=$("#selVeh"); const vs=[...S.vehicule].sort((a,b)=>(a.nr||"").localeCompare(b.nr||""));
+  if(!ui.veh||!byId("vehicule",ui.veh)) ui.veh=vs[0]?vs[0].id:null;
+  sv.innerHTML=vs.length?vs.map(v=>`<option value="${esc(v.id)}"${v.id===ui.veh?" selected":""}>${esc(v.nr)}${v.marca?" · "+esc(v.marca):""}</option>`).join(""):`<option value="">Adăugați întâi o mașină</option>`;
+  const v=byId("vehicule",ui.veh);
+  $("#plate").hidden=!v; if(v){$("#plate").textContent=v.nr; $("#vehInfo").textContent=`${v.combustibil||""} · consum normat ${fmt(num(v.consum),1)} l/100 km`} else $("#vehInfo").textContent="";
+  $("#selLuna").value=ui.luna;
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===ui.tab));
+  const ae=document.activeElement, keep=ae&&ae.id&&$("#view").contains(ae)?{id:ae.id,s:ae.selectionStart}:null;
+  $("#view").innerHTML=({foaie:vFoaie,gen:vGen,masini:vMasini,soferi:vSoferi,locatii:vLocatii,firma:vFirma}[ui.tab]||vFoaie)();
+  if(ui.tab==="gen") bindGen();
+  if(keep){const el=document.getElementById(keep.id); if(el){el.focus(); try{el.setSelectionRange(keep.s,keep.s)}catch(e){}}}
+}
+const opt=(arr,sel,lab=x=>x.nume)=>arr.map(x=>`<option value="${esc(x.id)}"${x.id===sel?" selected":""}>${esc(lab(x))}</option>`).join("");
+const noVeh=()=>`<div class="card empty">Nu există încă nicio mașină. Adăugați prima mașină în fila <b>Mașini</b>.</div>`;
+
+function vFoaie(){
+  if(!ui.veh) return noVeh();
+  const r=calc(ui.veh,ui.luna), sofDef=r.f.sofer||r.v.soferImplicit||"";
+  const sediu=S.locatii.find(l=>l.sediu);
+  const ec=ui.editCursa?S.curse.find(c=>c.id===ui.editCursa):null;
+  const c=ec||{data:ui.luna===today.toISOString().slice(0,7)?today.toISOString().slice(0,10):ui.luna+"-01",oraP:"08:00",oraS:"",sofer:sofDef,deLa:sediu?sediu.id:"",la:"",dusIntors:true,scop:"",kmP:r.kmEnd,kmS:""};
+  let prev=null; const rows=r.cs.map((x,i)=>{const gap=prev!==null&&Math.abs(num(x.kmP)-prev)>0.01; prev=num(x.kmS);
+    return `<tr class="${gap?"warn":""}"><td class="n">${i+1}</td><td class="n">${dataRo(x.data)}</td><td class="n">${esc(x.oraP)}–${esc(x.oraS)}</td><td>${esc(nume("soferi",x.sofer))}</td><td>${esc(traseu(x))}${gap?` <span class="pill w" title="Km la plecare nu continuă km la sosire ai cursei anterioare">km discontinui</span>`:""}${x.generat?` <span class="pill">generat</span>`:""}</td><td>${esc(x.scop)}</td><td class="n">${fmt(x.kmP)}</td><td class="n">${fmt(x.kmS)}</td><td class="n">${fmt(kmP(x))}</td><td><button class="ghost" data-act="editC" data-id="${esc(x.id)}" title="Modifică">✎</button><button class="ghost" data-act="delC" data-id="${esc(x.id)}" title="Șterge">✕</button></td></tr>`}).join("");
+  return `<section class="panel">
+  <div class="tiles">
+    <div class="tile"><div class="l">Km parcurși</div><div class="v">${fmt(r.km)}</div></div>
+    <div class="tile"><div class="l">Curse</div><div class="v">${r.cs.length}</div></div>
+    <div class="tile"><div class="l">Consum normat (l)</div><div class="v">${fmt(r.consum,2)}</div></div>
+    <div class="tile"><div class="l">Alimentat (l) · lei</div><div class="v">${fmt(r.alim,2)} · ${fmt(r.val,2)}</div></div>
+    <div class="tile ${r.stocF<0?"bad":"ok"}"><div class="l">Stoc final rezervor (l)</div><div class="v">${fmt(r.stocF,2)}</div></div>
+  </div>
+  ${r.stocF<0?`<div class="note"><b>Stoc negativ.</b> Consumul normat depășește combustibilul existent plus alimentările. Verificați alimentările lunii sau stocul inițial.</div>`:""}
+  <div class="card"><div class="row" style="justify-content:space-between"><h2>Foaia de parcurs · ${esc(lunaNume(ui.luna))}</h2>
+    <div class="row"><button data-act="dlHtml">Descarcă foaia pentru tipărire</button><button data-act="dlCsv">Descarcă pentru Excel (CSV)</button></div></div>
+    <form class="grid" id="fFoaie">
+      <label class="f">Nr. foaie<input id="ff_nr" name="nr" value="${esc(r.f.nr||"")}" placeholder="ex. 11/2026"></label>
+      <label class="f">Șofer principal<select id="ff_sof" name="sofer"><option value="">—</option>${opt(S.soferi,sofDef)}</select></label>
+      <label class="f">Stoc inițial rezervor (l)<input id="ff_stoc" name="stocInitial" inputmode="decimal" value="${esc(r.f.stocInitial??"")}" placeholder="${esc(fmt(r.stocI,2))} (preluat)"></label>
+      <label class="f">&nbsp;<button type="submit">Salvează antetul</button></label>
+    </form>
+    <div class="tablebox"><table>
+      <thead><tr><th class="n">Nr.</th><th class="n">Data</th><th class="n">Ora</th><th>Șofer</th><th>Traseu</th><th>Scopul deplasării</th><th class="n">Km plecare</th><th class="n">Km sosire</th><th class="n">Km</th><th></th></tr></thead>
+      <tbody>${rows||`<tr><td colspan="10" class="empty">Nicio cursă în ${esc(lunaNume(ui.luna))}. Adăugați una mai jos sau folosiți fila Generator curse.</td></tr>`}</tbody>
+      ${r.cs.length?`<tfoot><tr><td colspan="6">Total lună</td><td class="n">${fmt(r.kmStart)}</td><td class="n">${fmt(r.kmEnd)}</td><td class="n">${fmt(r.km)}</td><td></td></tr></tfoot>`:""}
+    </table></div>
+  </div>
+  <div class="two">
+  <form class="card" id="fCursa"><h2>${ec?"Modifică cursa":"Adaugă cursă"}</h2>
+    <div class="grid">
+      <label class="f">Data<input id="fc_data" type="date" name="data" value="${esc(c.data)}" required></label>
+      <label class="f">Ora plecare<input id="fc_op" type="time" name="oraP" value="${esc(c.oraP)}"></label>
+      <label class="f">Ora sosire<input id="fc_os" type="time" name="oraS" value="${esc(c.oraS)}"></label>
+      <label class="f">Șofer<select id="fc_sof" name="sofer"><option value="">—</option>${opt(S.soferi,c.sofer)}</select></label>
+      <label class="f">De la<select id="fc_de" name="deLa"><option value="">—</option>${opt(S.locatii,c.deLa)}</select></label>
+      <label class="f">La<select id="fc_la" name="la"><option value="">—</option>${opt(S.locatii,c.la)}</select></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:6px;padding-top:18px"><input id="fc_di" type="checkbox" name="dusIntors" ${c.dusIntors?"checked":""}> Dus-întors</label>
+      <label class="f">Km plecare<input id="fc_kp" name="kmP" inputmode="decimal" value="${esc(c.kmP)}" required></label>
+      <label class="f">Km sosire<input id="fc_ks" name="kmS" inputmode="decimal" value="${esc(c.kmS)}" placeholder="din distanțe"></label>
+    </div>
+    <label class="f">Scopul deplasării<input id="fc_scop" name="scop" value="${esc(c.scop)}" placeholder="ex. depunere documente"></label>
+    <div class="row"><button class="pri" type="submit">${ec?"Salvează modificarea":"Adaugă cursa"}</button>${ec?`<button type="button" data-act="cancelC">Renunță</button>`:""}<span class="muted" id="fc_hint">Dacă lăsați „Km sosire” gol, se calculează din tabelul de distanțe.</span></div>
+  </form>
+  <div class="card"><h2>Alimentări</h2>
+    <div class="tablebox"><table><thead><tr><th class="n">Data</th><th class="n">Litri</th><th class="n">Lei</th><th>Bon / factură</th><th></th></tr></thead>
+    <tbody>${r.al.map(a=>`<tr><td class="n">${dataRo(a.data)}</td><td class="n">${fmt(a.litri,2)}</td><td class="n">${fmt(a.valoare,2)}</td><td>${esc(a.doc)}</td><td><button class="ghost" data-act="delA" data-id="${esc(a.id)}" title="Șterge">✕</button></td></tr>`).join("")||`<tr><td colspan="5" class="empty">Nicio alimentare în această lună.</td></tr>`}</tbody></table></div>
+    <form class="grid" id="fAlim">
+      <label class="f">Data<input id="fa_d" type="date" name="data" value="${esc(ui.luna+"-01")}" required></label>
+      <label class="f">Litri<input id="fa_l" name="litri" inputmode="decimal" required></label>
+      <label class="f">Valoare (lei)<input id="fa_v" name="valoare" inputmode="decimal"></label>
+      <label class="f">Nr. bon<input id="fa_doc" name="doc"></label>
+      <label class="f">&nbsp;<button class="pri" type="submit">Adaugă</button></label>
+    </form>
+  </div></div>
+  </section>`;
+}
+
+function vMasini(){
+  return `<section class="panel"><div class="card"><h2>Mașini</h2>
+  <div class="tablebox"><table><thead><tr><th>Nr. înmatriculare</th><th>Marcă / model</th><th>Combustibil</th><th class="n">Consum normat l/100 km</th><th class="n">Km inițiali</th><th>Șofer implicit</th><th></th></tr></thead><tbody>
+  ${S.vehicule.map(v=>`<tr><td class="mono">${esc(v.nr)}</td><td>${esc(v.marca)}</td><td>${esc(v.combustibil)}</td><td class="n">${fmt(v.consum,1)}</td><td class="n">${fmt(v.kmInitial)}</td><td>${esc(nume("soferi",v.soferImplicit))}</td><td><button class="ghost" data-act="delV" data-id="${esc(v.id)}" title="Șterge">✕</button></td></tr>`).join("")||`<tr><td colspan="7" class="empty">Nicio mașină încă.</td></tr>`}
+  </tbody></table></div>
+  <form class="grid" id="fVeh">
+    <label class="f">Nr. înmatriculare<input id="fv_nr" name="nr" required placeholder="CJ 12 ABC"></label>
+    <label class="f">Marcă / model<input id="fv_m" name="marca"></label>
+    <label class="f">Combustibil<select id="fv_c" name="combustibil"><option>Motorină</option><option>Benzină</option><option>GPL</option><option>Hibrid</option><option>Electric</option></select></label>
+    <label class="f">Consum normat (l/100 km)<input id="fv_cons" name="consum" inputmode="decimal" required></label>
+    <label class="f">Km la bord la început<input id="fv_km" name="kmInitial" inputmode="decimal"></label>
+    <label class="f">Șofer implicit<select id="fv_s" name="soferImplicit"><option value="">—</option>${opt(S.soferi,"")}</select></label>
+    <label class="f">&nbsp;<button class="pri" type="submit">Adaugă mașina</button></label>
+  </form>
+  <p class="muted">Consumul normat se stabilește de regulă prin decizie internă a firmei. Verificați valoarea cu contabilul.</p></div></section>`;
+}
+function vSoferi(){
+  return `<section class="panel"><div class="card"><h2>Șoferi</h2>
+  <div class="tablebox"><table><thead><tr><th>Nume</th><th>Funcție</th><th>Nr. permis</th><th></th></tr></thead><tbody>
+  ${S.soferi.map(s=>`<tr><td>${esc(s.nume)}</td><td>${esc(s.functie)}</td><td class="mono">${esc(s.permis)}</td><td><button class="ghost" data-act="delS" data-id="${esc(s.id)}" title="Șterge">✕</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Niciun șofer încă.</td></tr>`}
+  </tbody></table></div>
+  <form class="grid" id="fSof">
+    <label class="f">Nume și prenume<input id="fs_n" name="nume" required></label>
+    <label class="f">Funcție<input id="fs_f" name="functie"></label>
+    <label class="f">Nr. permis<input id="fs_p" name="permis"></label>
+    <label class="f">&nbsp;<button class="pri" type="submit">Adaugă șoferul</button></label>
+  </form></div></section>`;
+}
+function vLocatii(){
+  const L=[...S.locatii].sort((a,b)=>(b.sediu?1:0)-(a.sediu?1:0)||a.nume.localeCompare(b.nume));
+  return `<section class="panel"><div class="two">
+  <div class="card"><h2>Locații</h2><p class="muted">Sediul, primăriile, clienții și alte puncte între care circulați. Marcați sediul ca punct de plecare.</p>
+  <div class="tablebox"><table><thead><tr><th>Denumire</th><th>Localitate</th><th>Scop implicit</th><th></th></tr></thead><tbody>
+  ${L.map(l=>`<tr><td>${esc(l.nume)} ${l.sediu?`<span class="pill">sediu</span>`:""}</td><td>${esc(l.localitate)}</td><td>${esc(l.scop)}</td><td><button class="ghost" data-act="delL" data-id="${esc(l.id)}" title="Șterge">✕</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Nicio locație încă.</td></tr>`}
+  </tbody></table></div>
+  <form class="grid" id="fLoc">
+    <label class="f">Denumire<input id="fl_n" name="nume" required placeholder="Primăria Florești"></label>
+    <label class="f">Localitate<input id="fl_l" name="localitate"></label>
+    <label class="f">Scop implicit<input id="fl_s" name="scop" placeholder="depunere documente"></label>
+    <label class="f" style="flex-direction:row;align-items:center;gap:6px;padding-top:18px"><input id="fl_sed" type="checkbox" name="sediu"> Este sediul</label>
+    <label class="f">&nbsp;<button class="pri" type="submit">Adaugă locația</button></label>
+  </form></div>
+  <div class="card"><h2>Distanțe (km, un sens)</h2><p class="muted">Introduceți o singură dată distanța dintre două locații. Se folosește la curse și la generator.</p>
+  <div class="tablebox"><table><thead><tr><th>De la</th><th>La</th><th class="n">Km</th><th></th></tr></thead><tbody>
+  ${S.distante.map(d=>`<tr><td>${esc(nume("locatii",d.a))}</td><td>${esc(nume("locatii",d.b))}</td><td class="n">${fmt(d.km,1)}</td><td><button class="ghost" data-act="delD" data-id="${esc(d.id)}" title="Șterge">✕</button></td></tr>`).join("")||`<tr><td colspan="4" class="empty">Nicio distanță încă.</td></tr>`}
+  </tbody></table></div>
+  <form class="grid" id="fDist">
+    <label class="f">De la<select id="fd_a" name="a" required><option value="">—</option>${opt(L,"")}</select></label>
+    <label class="f">La<select id="fd_b" name="b" required><option value="">—</option>${opt(L,"")}</select></label>
+    <label class="f">Km<input id="fd_km" name="km" inputmode="decimal" required></label>
+    <label class="f">&nbsp;<button class="pri" type="submit">Salvează distanța</button></label>
+  </form></div></div></section>`;
+}
+function vFirma(){
+  const f=firma();
+  return `<section class="panel"><form class="card" id="fFirma"><h2>Datele firmei (apar în antetul foii)</h2>
+  <div class="grid">
+    <label class="f">Denumire<input id="fi_n" name="nume" value="${esc(f.nume)}"></label>
+    <label class="f">CUI<input id="fi_c" name="cui" value="${esc(f.cui)}"></label>
+    <label class="f">Nr. Reg. Com.<input id="fi_r" name="regcom" value="${esc(f.regcom)}"></label>
+    <label class="f">Sediu<input id="fi_s" name="sediu" value="${esc(f.sediu)}"></label>
+    <label class="f">Aprobat de (administrator)<input id="fi_a" name="aprobat" value="${esc(f.aprobat)}"></label>
+  </div><div class="row"><button class="pri" type="submit">Salvează</button></div></form>
+  <div class="note"><b>De verificat cu contabilul.</b> Nu sunt sigur de toate cerințele legale actuale. Din câte știu, foaia de parcurs este un formular financiar-contabil reglementat prin OMFP 2634/2015, iar Codul fiscal o cere ca justificare pentru deducerea integrală a cheltuielilor cu autoturismele folosite exclusiv în scop economic. Legislația se poate fi schimbat. Confirmați câmpurile obligatorii și, dacă aveți un model propriu, aplicația poate fi adaptată după el.</div></section>`;
+}
+
+/* ---------- generator ---------- */
+function genDefaults(){
+  const key=ui.veh+"_"+ui.luna; if(ui.genKey===key&&ui.genDays)return; ui.genKey=key; ui.gen=null; ui.gp=null;
+  ui.genDays=new Set(lunaZile(ui.luna).filter(d=>dow(d)<5&&!SARB_FIXE.includes(d.slice(5))));
+}
+function vGen(){
+  if(!ui.veh) return noVeh();
+  genDefaults();
+  const r=calc(ui.veh,ui.luna), sediu=S.locatii.find(l=>l.sediu), v=r.v;
+  const kmStart=r.cs.length?r.kmEnd:ultimKm(ui.veh,ui.luna+"-01");
+  const dests=S.locatii.filter(l=>!l.sediu);
+  const zile=lunaZile(ui.luna), off=dow(zile[0]);
+  const cal=zileSapt.map(z=>`<div class="dh">${z}</div>`).join("")+Array(off).fill("<div></div>").join("")+zile.map(d=>`<label class="${ui.genDays.has(d)?"on":""}"><input type="checkbox" data-day="${d}" ${ui.genDays.has(d)?"checked":""}>${+d.slice(8)}</label>`).join("");
+  const g=ui.gen, gp=ui.gp||{};
+  return `<section class="panel">
+  <div class="note"><b>Important.</b> Generatorul propune o repartizare a kilometrilor pe curse, după locațiile și distanțele dumneavoastră. Fiecare cursă trebuie să corespundă unei deplasări reale în interes de serviciu. Verificați și corectați lista înainte de a o adăuga în foaie.</div>
+  <div class="two">
+  <div class="card"><h2>Parametri · ${esc(v.nr)} · ${esc(lunaNume(ui.luna))}</h2>
+    <div class="grid">
+      <label class="f">Km la bord la început<input id="g_ks" inputmode="decimal" value="${esc(gp.ks??kmStart)}"></label>
+      <label class="f">Km la bord la sfârșit<input id="g_ke" inputmode="decimal" value="${esc(gp.ke??"")}" placeholder="ex. ${esc(kmStart+1200)}"></label>
+      <label class="f">Plecare din<select id="g_base">${opt(S.locatii,gp.base||(sediu?sediu.id:""))}</select></label>
+      <label class="f">Șofer<select id="g_sof">${opt(S.soferi,gp.sof||r.f.sofer||v.soferImplicit||"")}</select></label>
+      <label class="f">Max. curse pe zi<select id="g_max">${[1,2,3,4].map(n=>`<option${n===(gp.maxD||2)?" selected":""}>${n}</option>`).join("")}</select></label>
+      <label class="f">Ora de început<input id="g_ora" type="time" value="${esc(gp.start||"08:00")}"></label>
+    </div>
+    <label class="f" style="flex-direction:row;align-items:center;gap:6px"><input id="g_fill" type="checkbox" ${gp.fill===false?"":"checked"}> Completează diferența rămasă cu deplasări locale (în localitatea sediului)</label>
+    <h3>Destinații folosite</h3>
+    <div class="row">${dests.map(l=>{const d=distKm(sediu&&sediu.id,l.id);return `<label class="f" style="flex-direction:row;align-items:center;gap:6px;color:var(--fg)"><input type="checkbox" class="g_dest" value="${esc(l.id)}" ${d&&(!gp.dests||gp.dests.includes(l.id))?"checked":""} ${d?"":"disabled"}> ${esc(l.nume)} <span class="muted mono">${d?fmt(d*2)+" km d-î":"fără distanță"}</span></label>`}).join("")||`<span class="muted">Adăugați locații și distanțe în fila Locații și distanțe.</span>`}</div>
+  </div>
+  <div class="card"><h2>Zile lucrate</h2><p class="muted">Implicit luni–vineri, fără sărbătorile legale cu dată fixă. Debifați manual Paștele, Rusaliile și concediile.</p>
+    <div class="days" id="g_days">${cal}</div>
+    <div class="row"><button class="pri" id="g_run">Generează propunerea</button><span class="muted">${ui.genDays.size} zile selectate</span></div>
+  </div></div>
+  ${g?`<div class="card"><div class="row" style="justify-content:space-between"><h2>Propunere: ${g.trips.length} curse · ${fmt(g.total)} km</h2>
+    <div class="row"><button id="g_again">Generează altă variantă</button><button class="pri" id="g_save">Adaugă în foaia lunii</button></div></div>
+    ${g.msg?`<div class="note">${esc(g.msg)}</div>`:""}
+    <div class="tablebox"><table><thead><tr><th class="n">Data</th><th class="n">Ora</th><th>Traseu</th><th>Scop</th><th class="n">Km plecare</th><th class="n">Km sosire</th><th class="n">Km</th></tr></thead><tbody>
+    ${g.trips.map(t=>`<tr><td class="n">${dataRo(t.data)}</td><td class="n">${t.oraP}–${t.oraS}</td><td>${esc(traseu(t))}</td><td>${esc(t.scop)}</td><td class="n">${fmt(t.kmP)}</td><td class="n">${fmt(t.kmS)}</td><td class="n">${fmt(kmP(t))}</td></tr>`).join("")}
+    </tbody></table></div></div>`:""}
+  </section>`;
+}
+function bindGen(){
+  const box=$("#g_days"); if(box) box.addEventListener("change",e=>{const d=e.target.dataset.day;if(!d)return;e.target.checked?ui.genDays.add(d):ui.genDays.delete(d);e.target.parentElement.classList.toggle("on",e.target.checked)});
+}
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const hm=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+function generate(){
+  const ks=num($("#g_ks").value), ke=num($("#g_ke").value), base=$("#g_base").value, sof=$("#g_sof")?$("#g_sof").value:"", maxD=+$("#g_max").value, fill=$("#g_fill").checked;
+  const start=$("#g_ora").value||"08:00"; const st=+start.slice(0,2)*60+ +start.slice(3,5);
+  const dests=[...document.querySelectorAll(".g_dest:checked")].map(i=>i.value);
+  const days=[...ui.genDays].sort();
+  ui.gp={ks,ke,base,sof,maxD,fill,start,dests};
+  const T=ke-ks;
+  if(!(T>0)){toast("Introduceți km la sfârșit mai mari decât km la început.");return}
+  if(!days.length){toast("Selectați cel puțin o zi.");return}
+  const routes=dests.map(id=>({id,km:2*distKm(base,id)})).filter(r=>r.km>0);
+  if(!routes.length&&!fill){toast("Bifați cel puțin o destinație cu distanță cunoscută.");return}
+  const load=Object.fromEntries(days.map(d=>[d,[]])); let rem=T;
+  const minR=routes.length?Math.min(...routes.map(r=>r.km)):Infinity;
+  let guard=0;
+  while(rem>=minR&&guard++<5000){
+    const free=days.filter(d=>load[d].length<maxD); if(!free.length)break;
+    const minLoad=Math.min(...free.map(d=>load[d].length));
+    const cand=free.filter(d=>load[d].length===minLoad);
+    const day=cand[Math.floor(Math.random()*cand.length)];
+    const fit=routes.filter(r=>r.km<=rem); if(!fit.length)break;
+    const pick=rem<Math.max(...routes.map(r=>r.km))*1.5?fit.reduce((a,b)=>b.km>a.km?b:a):fit[Math.floor(Math.random()*fit.length)];
+    load[day].push({la:pick.id,km:pick.km,dusIntors:true}); rem-=pick.km;
+  }
+  let msg="";
+  if(rem>0.5&&fill){ // deplasări locale
+    const sediu=byId("locatii",base)||{}; const loc=sediu.localitate||sediu.nume||"localitate";
+    let parts=Math.max(1,Math.ceil(rem/25)); const per=rem/parts;
+    const order=[...days].sort((a,b)=>load[a].length-load[b].length);
+    for(let i=0;i<parts;i++){const k=i===parts-1?rem-per*(parts-1):per; load[order[i%order.length]].push({local:true,km:Math.round(k*10)/10,text:`Deplasări locale ${loc}`})}
+    rem=0;
+  } else if(rem>0.5) msg=`Au rămas ${fmt(rem)} km nerepartizați (nicio rută nu se potrivea). Bifați completarea cu deplasări locale sau ajustați km de sfârșit.`;
+  const trips=[]; let odo=ks;
+  for(const d of days){ let t=st+rnd(0,40);
+    for(const x of load[d]){ const dur=x.km/45*60+rnd(30,90); const loc=byId("locatii",x.la)||{};
+      const kmRound=Math.round(x.km*10)/10;
+      const trip={veh:ui.veh,sofer:sof,data:d,oraP:hm(t),oraS:hm(t+dur),deLa:base,la:x.local?"":x.la,dusIntors:!x.local,scop:x.local?"deplasări locale în interes de serviciu":(loc.scop||"deplasare în interes de serviciu"),kmP:Math.round(odo*10)/10,kmS:Math.round((odo+kmRound)*10)/10,generat:true};
+      if(x.local) trip.traseuText=x.text;
+      trips.push(trip); odo+=kmRound; t+=dur+rnd(15,45);
+    }}
+  if(fill&&trips.length){const last=trips[trips.length-1]; last.kmS=ke;}
+  ui.gen={trips,total:trips.reduce((s,t)=>s+kmP(t),0),msg};
+  render();
+}
+async function saveGen(){
+  if(!ui.gen)return; const btn=$("#g_save"); btn.disabled=true; btn.textContent="Se salvează…";
+  let ok=0; for(const t of ui.gen.trips){ if(await save("curse",null,t)) ok++; else break; }
+  toast(`Am adăugat ${ok} curse în foaia lunii.`); ui.gen=null; ui.tab="foaie"; render();
+}
+
+/* ---------- export ---------- */
+function sheetHtml(){
+  const r=calc(ui.veh,ui.luna), f=firma(), v=r.v;
+  const rows=r.cs.map((c,i)=>`<tr><td>${i+1}</td><td>${dataRo(c.data)}</td><td>${esc(c.oraP)}</td><td>${esc(c.oraS)}</td><td>${esc(nume("soferi",c.sofer))}</td><td>${esc(traseu(c))}</td><td>${esc(c.scop)}</td><td class="n">${fmt(c.kmP)}</td><td class="n">${fmt(c.kmS)}</td><td class="n">${fmt(kmP(c))}</td><td></td></tr>`).join("");
+  return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><title>Foaie de parcurs ${esc(v.nr)} ${esc(ui.luna)}</title><style>
+@page{size:A4 landscape;margin:12mm}body{font-family:Arial,Helvetica,sans-serif;font-size:10.5px;color:#000}
+h1{font-size:16px;text-align:center;margin:6px 0}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:3px 4px;vertical-align:top}th{background:#eee}
+.n{text-align:right;white-space:nowrap}.hdr{display:flex;justify-content:space-between;gap:20px}.hdr div{line-height:1.5}.sig{display:flex;justify-content:space-between;margin-top:28px}.sig div{width:30%;text-align:center;border-top:1px solid #000;padding-top:4px}
+.fuel td{width:20%}</style></head><body>
+<div class="hdr"><div><b>${esc(f.nume||"Unitatea")}</b><br>CUI: ${esc(f.cui||"")} · Reg. Com.: ${esc(f.regcom||"")}<br>${esc(f.sediu||"")}</div><div style="text-align:right">Nr. foaie: <b>${esc(r.f.nr||"")}</b><br>Perioada: ${esc(lunaNume(ui.luna))}</div></div>
+<h1>FOAIE DE PARCURS</h1>
+<p>Autovehicul: <b>${esc(v.nr)}</b> ${esc(v.marca||"")} · Combustibil: ${esc(v.combustibil||"")} · Consum normat: ${fmt(num(v.consum),1)} l/100 km · Șofer: ${esc(nume("soferi",r.f.sofer||v.soferImplicit))}</p>
+<table><thead><tr><th>Nr.</th><th>Data</th><th>Ora plecare</th><th>Ora sosire</th><th>Șofer</th><th>Traseu</th><th>Scopul deplasării</th><th>Km plecare</th><th>Km sosire</th><th>Km parcurși</th><th>Semnătura</th></tr></thead>
+<tbody>${rows}</tbody><tfoot><tr><td colspan="9"><b>Total km parcurși</b></td><td class="n"><b>${fmt(r.km)}</b></td><td></td></tr></tfoot></table>
+<br><table class="fuel"><tr><th>Stoc inițial (l)</th><th>Alimentat (l)</th><th>Consum normat (l)</th><th>Stoc final (l)</th><th>Valoare alimentări (lei)</th></tr>
+<tr><td class="n">${fmt(r.stocI,2)}</td><td class="n">${fmt(r.alim,2)}</td><td class="n">${fmt(r.consum,2)}</td><td class="n">${fmt(r.stocF,2)}</td><td class="n">${fmt(r.val,2)}</td></tr></table>
+${r.al.length?`<p>Alimentări: ${r.al.map(a=>`${dataRo(a.data)} – ${fmt(a.litri,2)} l${a.doc?" (bon "+esc(a.doc)+")":""}`).join("; ")}</p>`:""}
+<div class="sig"><div>Șofer</div><div>Verificat (compartiment financiar)</div><div>Aprobat${f.aprobat?"<br>"+esc(f.aprobat):""}</div></div>
+<p style="margin-top:14px;color:#555">Pentru PDF: deschideți fișierul în browser și alegeți Tipărire → Salvare ca PDF.</p>
+</body></html>`;
+}
+function csv(){
+  const r=calc(ui.veh,ui.luna); const q=s=>`"${String(s??"").replace(/"/g,'""')}"`;
+  const lines=[["Nr","Data","Ora plecare","Ora sosire","Sofer","Traseu","Scop","Km plecare","Km sosire","Km parcursi"].map(q).join(";")];
+  r.cs.forEach((c,i)=>lines.push([i+1,dataRo(c.data),c.oraP,c.oraS,nume("soferi",c.sofer),traseu(c),c.scop,fmt(c.kmP),fmt(c.kmS),fmt(kmP(c))].map(q).join(";")));
+  lines.push(["","","","","","","Total","","",fmt(r.km)].map(q).join(";"));
+  lines.push(""); lines.push([q("Stoc initial l"),q(fmt(r.stocI,2)),q("Alimentat l"),q(fmt(r.alim,2)),q("Consum normat l"),q(fmt(r.consum,2)),q("Stoc final l"),q(fmt(r.stocF,2))].join(";"));
+  return "﻿"+lines.join("\r\n");
+}
+async function download(name,data){
+  if(!dl){toast("Descărcarea nu este disponibilă în această vizualizare.");return}
+  try{await dl.save({filename:name,data}); toast("Fișierul a fost trimis spre salvare.")}
+  catch(e){toast(e.code==="declined"?"Descărcare anulată.":"Descărcarea nu a reușit ("+e.code+").")}
+}
+
+/* ---------- evenimente ---------- */
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;ui.tab=b.dataset.tab;try{localStorage.setItem("fp_tab",ui.tab)}catch(x){}render()});
+$("#selVeh").addEventListener("change",e=>{ui.veh=e.target.value;ui.editCursa=null;try{localStorage.setItem("fp_veh",ui.veh)}catch(x){}render()});
+$("#selLuna").addEventListener("change",e=>{if(e.target.value){ui.luna=e.target.value;ui.editCursa=null;render()}});
+$("#view").addEventListener("click",async e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  if(b.id==="g_run"||b.id==="g_again"){generate();return}
+  if(b.id==="g_save"){saveGen();return}
+  const a=b.dataset.act, id=b.dataset.id; if(!a)return;
+  if(a==="editC"){ui.editCursa=id;render();$("#fCursa").scrollIntoView({behavior:"smooth",block:"center"});return}
+  if(a==="cancelC"){ui.editCursa=null;render();return}
+  if(a==="dlHtml"){const v=byId("vehicule",ui.veh);download(`foaie-parcurs-${(v.nr||"").replace(/\s+/g,"")}-${ui.luna}.html`,sheetHtml());return}
+  if(a==="dlCsv"){const v=byId("vehicule",ui.veh);download(`foaie-parcurs-${(v.nr||"").replace(/\s+/g,"")}-${ui.luna}.csv`,csv());return}
+  // ștergeri cu confirmare în pagină: al doilea clic confirmă
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="Sigur?";b.style.color="var(--bad)";setTimeout(()=>{if(b.isConnected){b.dataset.armed="";b.textContent="✕";b.style.color=""}},3000);return}
+  const map={delC:"curse",delA:"alimentari",delV:"vehicule",delS:"soferi",delL:"locatii",delD:"distante"};
+  if(map[a]) await del(map[a],id);
+});
+$("#view").addEventListener("change",e=>{
+  if(e.target.id==="fc_la"||e.target.id==="fc_de"||e.target.id==="fc_di"){
+    const fm=$("#fCursa"), d=form(fm); const loc=byId("locatii",d.la); if(e.target.id==="fc_la"&&loc&&loc.scop&&!d.scop) $("#fc_scop").value=loc.scop;
+    const k=distKm(d.deLa,d.la); $("#fc_hint").textContent=k?`Distanța: ${fmt(k*(d.dusIntors?2:1),1)} km`:(d.deLa&&d.la?"Nu există distanță salvată între aceste locații. Completați km sosire.":"Dacă lăsați „Km sosire” gol, se calculează din tabelul de distanțe.");
+  }
+});
+$("#view").addEventListener("submit",async e=>{
+  e.preventDefault(); const fm=e.target, d=form(fm);
+  if(fm.id==="fCursa"){
+    let ks=d.kmS; if(ks===""){const k=distKm(d.deLa,d.la); if(!k){toast("Completați km la sosire sau salvați distanța dintre locații.");return} ks=num(d.kmP)+k*(d.dusIntors?2:1)}
+    if(num(ks)<num(d.kmP)){toast("Km la sosire trebuie să fie mai mari decât km la plecare.");return}
+    const ec=ui.editCursa?S.curse.find(c=>c.id===ui.editCursa):null;
+    const rec={...(ec||{}),veh:ui.veh,data:d.data,oraP:d.oraP,oraS:d.oraS,sofer:d.sofer,deLa:d.deLa,la:d.la,dusIntors:d.dusIntors,scop:d.scop,kmP:num(d.kmP),kmS:Math.round(num(ks)*10)/10}; delete rec.id;
+    if(ec&&(ec.deLa!==d.deLa||ec.la!==d.la)) delete rec.traseuText;
+    if(await save("curse",ui.editCursa,rec)){toast(ec?"Cursa a fost modificată.":"Cursa a fost adăugată.");ui.editCursa=null; if(!d.data.startsWith(ui.luna)){ui.luna=d.data.slice(0,7)} render()}
+  } else if(fm.id==="fAlim"){
+    if(await save("alimentari",null,{veh:ui.veh,data:d.data,litri:num(d.litri),valoare:num(d.valoare),doc:d.doc})) toast("Alimentarea a fost adăugată.");
+  } else if(fm.id==="fFoaie"){
+    const rec={nr:d.nr,sofer:d.sofer}; if(d.stocInitial!=="") rec.stocInitial=num(d.stocInitial);
+    if(await save("foi",`${ui.veh}_${ui.luna}`,rec)) toast("Antetul foii a fost salvat.");
+  } else if(fm.id==="fVeh"){
+    if(await save("vehicule",null,{nr:d.nr.toUpperCase(),marca:d.marca,combustibil:d.combustibil,consum:num(d.consum),kmInitial:num(d.kmInitial),soferImplicit:d.soferImplicit})) toast("Mașina a fost adăugată.");
+  } else if(fm.id==="fSof"){
+    if(await save("soferi",null,{nume:d.nume,functie:d.functie,permis:d.permis})) toast("Șoferul a fost adăugat.");
+  } else if(fm.id==="fLoc"){
+    if(await save("locatii",null,{nume:d.nume,localitate:d.localitate,scop:d.scop,sediu:d.sediu})) toast("Locația a fost adăugată.");
+  } else if(fm.id==="fDist"){
+    if(d.a===d.b){toast("Alegeți două locații diferite.");return}
+    const ex=S.distante.find(x=>(x.a===d.a&&x.b===d.b)||(x.a===d.b&&x.b===d.a));
+    if(await save("distante",ex?ex.id:null,{a:d.a,b:d.b,km:num(d.km)})) toast("Distanța a fost salvată.");
+  } else if(fm.id==="fFirma"){
+    if(await save("setari","firma",d)) toast("Datele firmei au fost salvate.");
+  }
+});
+render(); boot();
+</script>
